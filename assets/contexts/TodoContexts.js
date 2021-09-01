@@ -1,5 +1,5 @@
 import React, { createContext } from 'react';
-
+import axios from 'axios';
 export const TodoContext = createContext();
 
 class TodoContextProvider extends React.Component {
@@ -7,36 +7,59 @@ class TodoContextProvider extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            todos: [
-                {name:'do somthing'},
-                {name:'do somthing'},
-                {name:'do somthing'},
-                {name:'do somthing'},
-                {name:'do somthing'}
-            ],
+            todos: [],
         };
+        this.readTodo();
 
     }
 
 
     //create
-    createTodo() {
+    createTodo(event, todo) {
+        event.preventDefault();
+        let data = [...this.state.todos];
+
+        data.push(todo);
+        //console.log(todo);
+        this.setState({ todos: data });
 
     }
 
 
     //read -fetch 
     readTodo() {
-
+        axios.get('/api/todo/read')
+            .then(response => {
+                this.setState({ todos: response.data });
+            }).catch(error => {
+                console.error(error);
+            })
     }
 
     //update
-    updateTodo() {
+    updateTodo(data) {
+        let todos = [...this.state.todos];
+        let todo = todos.find(todo => {
+            return todo.id === data.id;
+        });
 
+        todo.name = data.name;
+
+
+        this.setState({ todos: todos });
     }
 
     //delete
-    deleteTodo() {
+    deleteTodo(data) {
+
+        let todos = [...this.state.todos];
+        let todo = todos.find(todo => {
+            return todo.id === data.id;
+        });
+
+        todos.splice(todos.indexOf(todo), 1);
+
+        this.setState({ todos: todos });
 
     }
 
